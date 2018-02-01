@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyText
+  unit: 1
+  type_pack: 1
+
+two:
+  name: MyText
+  unit: 1
+  type_pack: 1
