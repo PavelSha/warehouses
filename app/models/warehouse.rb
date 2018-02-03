@@ -1,6 +1,4 @@
 class Warehouse < ApplicationRecord
-  attr_accessor :count
-
   class << self
     def create_record(n, ad, ar)
       w = Warehouse.new(name: n, address: ad, count: 0, area: ar)
