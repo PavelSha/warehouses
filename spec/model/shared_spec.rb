@@ -156,7 +156,7 @@ RSpec.describe History, :type => :model do
       push_product(3, 1)
       push_product(3, 3)
       push_product(1, 3)
-      ar = get_empty_warehouses({:skip => true})
+      ar = get_empty_warehouses(0, 0, 0, 0, 0, {:skip => true})
       expect(ar).to match_array([1, 4, 5])
       expect(ar).not_to match_array([2, 3])
     end
@@ -238,7 +238,7 @@ RSpec.describe History, :type => :model do
       w.save
       Warehouse.record_timestamps = true
 
-      ar = get_empty_warehouses({:skip => true}, 0, 0, 2)
+      ar = get_empty_warehouses(0, 0, 2, 0, 0, {:skip => true})
       expect(ar).to match_array([1, 5])
 
     end
@@ -466,13 +466,13 @@ RSpec.describe History, :type => :model do
     end
 
     it "get history product" do
-      ar = get_history_product(1, {:skip => true}, 0, 0, 0, 0, 12)
+      ar = get_history_product(1, 0, 0, 0, 0, 12, {:skip => true})
       expect(ar).to match_array([3])
-      ar = get_history_product(1, {:skip => true}, 0, 0, 0, 0, 15)
+      ar = get_history_product(1, 0, 0, 0, 0, 15, {:skip => true})
       expect(ar).to match_array([4, 3])
-      ar = get_history_product(6, {:skip => true}, 0, 0, 0, 0, 15)
+      ar = get_history_product(6, 0, 0, 0, 0, 15, {:skip => true})
       expect(ar).to match_array([])
-      ar = get_history_product(5, {:skip => true}, 0, 0, 0, 0, 10)
+      ar = get_history_product(5, 0, 0, 0, 0, 10, {:skip => true})
       expect(ar).to match_array([2, 1, 4, 5, 3, 2, 3])
     end
   end

@@ -66,12 +66,12 @@ module ApplicationHelper
   end
 
   # If time is null, it don't use
-  def get_empty_warehouses(params, sec = 0, min = 0, h = 0)
+  def get_empty_warehouses(sec = 0, min = 0, h = 0, d = 0, m = 0, params = nil)
     ar = []
-    dur = Time.now - (sec + 60 * (min + 60 * h))
+    dur = Time.now - (sec + 60 * (min + 60 * h) + d.to_i.days + + m.to_i.month)
     Warehouse.find_each do |w|
       next unless w.count == 0
-      next if w.updated_at.utc >= dur.utc && (sec != 0 || min != 0 || h != 0)
+      next if w.updated_at.utc >= dur.utc && (sec != 0 || min != 0 || h != 0 || d != 0 || m != 0)
 
       unless params and params[:skip]
         puts "Name: #{w.name}"
@@ -84,7 +84,7 @@ module ApplicationHelper
     ar
   end
 
-  def get_path_product(id_p, params)
+  def get_path_product(id_p, params = nil)
     ar = []
     str = ""
     History.find_each do |h|
@@ -101,7 +101,7 @@ module ApplicationHelper
     ar
   end
 
-  def get_intensity(m, params)
+  def get_intensity(m, params = nil)
     raise 'the number of the months should be greater than zero' unless m > 0
 
     time_mount = 60 * 60 * 24 * 30
@@ -127,12 +127,12 @@ module ApplicationHelper
   end
 
   # If time is null, it don't use
-  def get_history_product(id_p, params, sec = 0, min = 0, h = 0, d = 0, m = 0)
+  def get_history_product(id_p, sec = 0, min = 0, hh = 0, d = 0, m = 0, params = nil)
     ar = []
-    dur = Time.now - ((sec + 60 * (min + 60 * h)) + d.to_i.days + + m.to_i.month)
+    dur = Time.now - ((sec + 60 * (min + 60 * hh)) + d.to_i.days + + m.to_i.month)
     History.find_each do |h|
       next unless h.product_id == id_p
-      next if h.created_at.utc < dur.utc && (sec != 0 || min != 0 || h != 0 || d != 0 || m != 0)
+      next if h.created_at.utc < dur.utc && (sec != 0 || min != 0 || hh != 0 || d != 0 || m != 0)
 
       ar.push(h.warehouse_now_id) unless h.warehouse_now_id.nil?
 
