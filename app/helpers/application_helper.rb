@@ -55,10 +55,13 @@ module ApplicationHelper
     remove_product(id_p) unless p.nil?
   end
 
-  def get_empty_warehouses(params)
-    c = 0
+  # If time is null, it don't use
+  def get_empty_warehouses(params, sec = 0, min = 0, h = 0)
+    ar = []
+    dur = Time.now - (sec + 60 * (min + 60 * h))
     Warehouse.find_each do |w|
       next unless w.count == 0
+      next if w.updated_at.utc >= dur.utc && (sec != 0 || min != 0 || h != 0)
 
       unless params and params[:skip]
         puts "Name: #{w.name}"
@@ -66,8 +69,26 @@ module ApplicationHelper
         puts "Area: #{w.area}"
         puts ' -------------------------- '
       end
-      c += 1
+      ar.push(w.id)
     end
-    c
+    ar
   end
+
+  def get_path_product(id_p, params)
+    ar = []
+    str = ""
+    History.find_each do |h|
+      next unless h.product_id == id_p
+
+      unless h.warehouse_now_id.nil?
+        str += " -> #{h.warehouse_now_id}"
+        ar.push(h.warehouse_now_id)
+      else
+        str += ' -> '
+      end
+    end
+    puts str unless params and params[:skip]
+    ar
+  end
+
 end
