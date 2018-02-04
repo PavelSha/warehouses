@@ -6,8 +6,7 @@ class Product < ApplicationRecord
     end
 
     def delete_record(id)
-      pr = Product.delete(id)
-      pr.save
+      Product.delete(id)
     end
   end
 end

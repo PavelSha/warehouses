@@ -8,7 +8,14 @@ RSpec.describe Product, :type => :model do
     expect(p.unit).to eq(0)
     expect(p.type_pack).to eq(1)
   end
-  # TODO: remove_product
+
+  it "remove prodcut" do
+    add_product("Beef", 0, 1)
+    remove_product(1)
+    expect {
+      Product.find(1)
+    }.to raise_error(ActiveRecord::RecordNotFound)
+  end
 end
 
 RSpec.describe Warehouse, :type => :model do
@@ -22,7 +29,16 @@ RSpec.describe Warehouse, :type => :model do
     expect(w.area).to eq(23.75)
     expect(w.count).to eq(0)
   end
-  # TODO: remove_warehouse
+
+  it "remove warehouse" do
+    add_warehouse("The Best", "Department of State" + "\n" +
+        "4150 Sydney Place" + "\n" +
+        "Washington, DC 20521-4150", 23.75)
+    remove_warehouse(1)
+    expect {
+      Warehouse.find(1)
+    }.to raise_error(ActiveRecord::RecordNotFound)
+  end
 end
 
 RSpec.describe History, :type => :model do
@@ -37,18 +53,54 @@ RSpec.describe History, :type => :model do
     }.to raise_error("Warehouse 1 not found")
   end
 
-  it " create with one warehouse" do
+  it "no create for duplicates" do
     add_product("Beef", 0, 1)
     add_warehouse("The Best", "Department of State" + "\n" +
         "4150 Sydney Place" + "\n" +
         "Washington, DC 20521-4150", 23.75)
+    push_product(1, 1)
     h = push_product(1, 1)
-    expect(h.product_id).to eq(1)
-    expect(h.warehouse_was_id).to be_nil
-    expect(h.warehouse_now_id).to eq(1)
+    expect(h).to be_nil
+  end
 
-    w = Warehouse.find(h.warehouse_now_id)
-    expect(w.count).to eq(1)
+  context " create with one warehouse" do
+    before(:each) do
+      add_product("Beef", 0, 1)
+      add_warehouse("The Best", "Department of State" + "\n" +
+          "4150 Sydney Place" + "\n" +
+          "Washington, DC 20521-4150", 23.75)
+    end
+
+    it " create with one warehouse" do
+      h = push_product(1, 1)
+      expect(h.product_id).to eq(1)
+      expect(h.warehouse_was_id).to be_nil
+      expect(h.warehouse_now_id).to eq(1)
+
+      w = Warehouse.find(h.warehouse_now_id)
+      expect(w.count).to eq(1)
+    end
+
+    it " pop_product" do
+      push_product(1, 1)
+      h = pop_product(1)
+
+      expect(h.product_id).to eq(1)
+      expect(h.warehouse_was_id).to eq(1)
+      expect(h.warehouse_now_id).to be_nil
+
+      w = Warehouse.find(h.warehouse_was_id)
+      expect(w.count).to eq(0)
+    end
+
+    it " pop full product" do
+      push_product(1, 1)
+      pop_full_product(1)
+
+      expect {
+        Product.find(1)
+      }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   it " create with two warehouses" do

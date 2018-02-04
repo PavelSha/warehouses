@@ -6,8 +6,7 @@ class Warehouse < ApplicationRecord
     end
 
     def delete_record(id)
-      pr = Warehouse.delete(id)
-      pr.save
+      Warehouse.delete(id)
     end
   end
 end

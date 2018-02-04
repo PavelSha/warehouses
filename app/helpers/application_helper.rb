@@ -11,7 +11,7 @@ module ApplicationHelper
     Product.delete_record(id)
   end
 
-  def remove_warehouse(n, ad, ar)
+  def remove_warehouse(id)
     Warehouse.delete_record(id)
   end
 
@@ -26,6 +26,12 @@ module ApplicationHelper
 
     unless h.nil?
       id_old = h.warehouse_now_id
+
+      if id_old == id_w
+        puts 'This product is already in the warehouse' unless Rails.env.test?
+        return nil
+      end
+
       w_old = Warehouse.find(id_old)
       w_old.count -= 1
       w_old.save
@@ -45,6 +51,10 @@ module ApplicationHelper
 
     p = History.where(['product_id = ?', id_p]).last
     raise "Product #{id_p} not found in history" if p.nil?
+
+    w_now = Warehouse.find(p.warehouse_now_id)
+    w_now.count -= 1
+    w_now.save
 
     History.create_record(id_p, p.warehouse_now_id, nil)
   end
